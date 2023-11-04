@@ -2,96 +2,184 @@
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 
-// Notiz: Länderspiele vom DEB in Email Rechnung nachschauen
+namespace DebScraper;
 
-IWebDriver _driver = new ChromeDriver();
-string _gameIdFile = "C:\\Users\\nicof\\Desktop\\del\\IDs\\GameIds.txt";
-List<Game> MyGames = new List<Game>();
-
+public class Program
 {
-    Console.WriteLine(" --- Start Webscraping");
+    static string _gameUrl = "https://deb-online.live/spielbericht/?gameId=";
 
-    List<liga> ligen = new List<liga>();
-    ligen.Add(new liga
-              {
-                  sourceUrl = "https://deb-online.live/liga/herren/oberliga-sued/",
-                  foundGamesUrl = new List<string>()
-              });
+    static IWebDriver _driver = new ChromeDriver();
 
-    foreach (var liga in ligen)
+    static string _gameIdFile = "C:\\Users\\public\\Documents\\DEB\\GameIds.txt";
+
+    static List<Game> _myGames = new List<Game>();
+
+    static int _yearOfTaxes = 2022;
+
+    static List<liga> _ligen { get; set; } = new List<liga>();
+
+    public static void Main(string[] args)
     {
-        _driver.Navigate().GoToUrl(liga.sourceUrl);
-
-        System.Threading.Thread.Sleep(500);
-
-        IWebElement CookieBoxSaveButton = _driver.FindElement(By.Id("CookieBoxSaveButton"));
-        CookieBoxSaveButton.Click();
-
-        System.Threading.Thread.Sleep(500);
-        List<string> GameIds = Ligen.ReadFileLines(_gameIdFile);
-        
-        foreach (var GameId in GameIds)
+        try
         {
-            try
-            {
-                string gameUrl = "https://deb-online.live/spielbericht/?gameId=" + GameId;
-                _driver.Navigate().GoToUrl(gameUrl);
-                System.Threading.Thread.Sleep(1000);
-                IWebElement buttonSpielbericht = _driver.FindElement(By.Id("btn-report"));
-                buttonSpielbericht.Click();
-                System.Threading.Thread.Sleep(1000);
-
-                //var element = driver.FindElement(By.ClassName("#pbp_report > div > div.-hd-los-game-full-report-game-facts > div.-hd-los-game-full-report-game-fact-row.-hd-los-game-full-report-game-fact-row-linesman1 > div.-hd-los-game-full-report-game-fact-value"));
-                List<IWebElement> RefGespann = new List<IWebElement>();
-                RefGespann.Add(_driver.FindElement(By.CssSelector(".-hd-los-game-full-report-game-fact-row.-hd-los-game-full-report-game-fact-row-linesman1 .-hd-los-game-full-report-game-fact-value > div")));
-                RefGespann.Add(_driver.FindElement(By.CssSelector(".-hd-los-game-full-report-game-fact-row.-hd-los-game-full-report-game-fact-row-linesman2 .-hd-los-game-full-report-game-fact-value > div")));
-                RefGespann.Add(_driver.FindElement(By.CssSelector(".-hd-los-game-full-report-game-fact-row.-hd-los-game-full-report-game-fact-row-referee1 .-hd-los-game-full-report-game-fact-value > div")));
-                RefGespann.Add(_driver.FindElement(By.CssSelector(".-hd-los-game-full-report-game-fact-row.-hd-los-game-full-report-game-fact-row-referee2 .-hd-los-game-full-report-game-fact-value > div")));
+            Console.WriteLine(" --- Start Webscraping");
+            _yearOfTaxes = getYear();
+            _ligen = GetLigen();
+            if _ligen.Count = 0
                 
+
+            foreach (var liga in _ligen)
+            {
+                _driver.Navigate().GoToUrl(liga.sourceUrl);
+
                 System.Threading.Thread.Sleep(500);
 
-                if (RefGespann.FirstOrDefault(refs => refs.Text.ToLower().Contains("filips")) != null)
+                IWebElement CookieBoxSaveButton = _driver.FindElement(By.Id("CookieBoxSaveButton"));
+                CookieBoxSaveButton.Click();
+
+                System.Threading.Thread.Sleep(500);
+                Liga manuellLiga = new Liga()
+                                   {
+                                       name = liga.name,
+                                       sourceUrl = liga.sourceUrl,
+                                       Ids = Ligen.ReadFileLines(_gameIdFile);
+                                   };
+                                   }
+                List<string> GameIds = Ligen.ReadFileLines(_gameIdFile);
+
+                foreach (var GameId in GameIds)
                 {
-                    Console.WriteLine(" --- Game found: " + gameUrl);
-                    Game game = new Game()
-                                {
-                                    date = DateTime.Now,
-                                    liga = liga.sourceUrl,
-                                    homeTeam = "homeTeam",
-                                    Guid = Guid.NewGuid()
-                                };
-                        
-                    IWebElement dateElement = _driver.FindElement(By.CssSelector(".-hd-los-game-full-report-game-fact-row-scheduledDate .-hd-los-game-full-report-game-fact-value > div"));
-                    DateTime.TryParse(dateElement.Text, out DateTime date);
-                    if (date.Year == 2022)
+                    try
                     {
-                        MyGames.Add(gameUrl);
+                        string GameNumber = GameIds.FirstOrDefault(game => game == GameId);
+                        string SpecificGameUrl = _gameUrl + GameId;
+                        _driver.Navigate().GoToUrl(SpecificGameUrl);
+                        System.Threading.Thread.Sleep(1000);
+                        IWebElement buttonSpielbericht = _driver.FindElement(By.Id("btn-report"));
+                        buttonSpielbericht.Click();
+                        System.Threading.Thread.Sleep(1000);
+
+                        //var element = driver.FindElement(By.ClassName("#pbp_report > div > div.-hd-los-game-full-report-game-facts > div.-hd-los-game-full-report-game-fact-row.-hd-los-game-full-report-game-fact-row-linesman1 > div.-hd-los-game-full-report-game-fact-value"));
+                        List<IWebElement> RefGespann = new List<IWebElement>();
+                        RefGespann.Add(_driver.FindElement(By.CssSelector(".-hd-los-game-full-report-game-fact-row.-hd-los-game-full-report-game-fact-row-linesman1 .-hd-los-game-full-report-game-fact-value > div")));
+                        RefGespann.Add(_driver.FindElement(By.CssSelector(".-hd-los-game-full-report-game-fact-row.-hd-los-game-full-report-game-fact-row-linesman2 .-hd-los-game-full-report-game-fact-value > div")));
+                        RefGespann.Add(_driver.FindElement(By.CssSelector(".-hd-los-game-full-report-game-fact-row.-hd-los-game-full-report-game-fact-row-referee1 .-hd-los-game-full-report-game-fact-value > div")));
+                        RefGespann.Add(_driver.FindElement(By.CssSelector(".-hd-los-game-full-report-game-fact-row.-hd-los-game-full-report-game-fact-row-referee2 .-hd-los-game-full-report-game-fact-value > div")));
+
+                        System.Threading.Thread.Sleep(500);
+
+                        if (RefGespann.FirstOrDefault(refs => refs.Text.ToLower().Contains("filips")) != null)
+                        {
+                            Console.WriteLine(" --- Game found: " + SpecificGameUrl);
+                            Game game = new Game()
+                                        {
+                                            url = SpecificGameUrl,
+                                            Guid = Guid.Parse(GameId),
+                                            liga = "",
+                                        };
+
+                            IWebElement dateElement = _driver.FindElement(By.CssSelector(".-hd-los-game-full-report-game-fact-row-scheduledDate .-hd-los-game-full-report-game-fact-value > div"));
+                            DateTime.TryParse(dateElement.Text, out DateTime date);
+                            game.date = date;
+                            game.ort = _driver.FindElement(By.CssSelector(".-hd-los-game-full-report-game-fact-row-location .-hd-los-game-full-report-game-fact-value > div")).Text;
+
+                            if (date.Year == _yearOfTaxes)
+                            {
+                                _myGames.Add(game);
+                            }
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine(" --- Exception: " + e.Message);
+                        Console.WriteLine(" --- Exception: " + GameId);
                     }
                 }
+
+                Console.WriteLine(" --- Finished Webscraping");
+
+                Console.WriteLine($" ------ Full List of Games found in {_yearOfTaxes} - there were {_myGames.Count.ToString()} Games foundt ------");
+                _myGames.Sort((x, y) => DateTime.Compare(x.date, y.date));
+                foreach (var game in _myGames)
+                {
+                    Console.WriteLine(" --- Game found in 2022: " + game.date.Date + ";" + game.ort + ";" + game.liga + ";" + _gameUrl + game.Guid);
+                }
+
+                Console.WriteLine("------ Tax Analyze done. Thank you! ------");
             }
-            catch (Exception e)
-            {
-                Console.WriteLine(" --- Exception: " + e.Message);
-                Console.WriteLine(" --- Exception: " + GameId);
-            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(" --- Big exception" + ex.Message);
         }
 
-        Console.WriteLine(" --- Finished Webscraping");
-MyGames.
-        foreach (var game in MyGames)
         {
-            Console.WriteLine(" --- Game found in 2022: " + game);
+            // Treiber schließen
+            _driver.Quit();
         }
     }
-}
-catch (Exception ex)
-{
-    Console.WriteLine(" --- Big exception" + ex.Message);
-}
-finally
-{
-    // Treiber schließen
-    _driver.Quit();
+
+    public static List<liga> GetLigen(int year)
+    {
+        List<liga> ligen = new List<liga>();
+        string oberligaSued = "https://deb-online.live/liga/herren/oberliga-sued/";
+        ligen.Add(new liga
+                  {
+                      name = "Oberliga Süd",
+                      sourceUrl = oberligaSued,
+                      Ids = GetIds(oberligaSued, year)
+                  });
+        
+        string oberligaNord = "https://deb-online.live/liga/herren/oberliga-nord/";
+        ligen.Add(new liga
+                  {
+                        name = "Oberliga Nord",
+                      sourceUrl = oberligaNord,
+                      Ids = GetIds(oberligaNord, year)
+                  });
+        string frauen = "https://deb-online.live/liga/damen/bundesliga/";
+        ligen.Add(new liga
+                  {
+                      name = "Frauen",
+                      sourceUrl = frauen,
+                      Ids = GetIds(frauen, year)
+                  });
+        string frauenPokal = "https://deb-online.live/liga/damen/deb-pokal-frauen/";
+        ligen.Add(new liga
+                  {
+                      name = "Frauen Pokal",
+                      sourceUrl = frauenPokal,
+                      Ids = GetIds(frauenPokal, year)
+                  });
+
+        string dnl = "https://deb-online.live/liga/herren/u20-dnl/";
+        ligen.Add(new liga
+                  {
+                      name = "DNL",
+                      sourceUrl = dnl,
+                      Ids = GetIds(dnl, year)
+                  });
+        return ligen;
+    }
+
+    public static List<Guid> GetIds(string sourceUrlLiga, int season)
+    {
+        return new List<Guid>();
+    }
+
+    public static int getYear()
+    {
+        try
+        {
+            Console.WriteLine(" --- Please enter the year of the taxes: ");
+            string input = Console.ReadLine();
+            return int.Parse(input);
+        }
+        catch (Exception e)
+        {
+            return 0;
+        }
+    }
 }
 
 // //        var actions = new Actions(driver);

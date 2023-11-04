@@ -1,7 +1,8 @@
 ﻿namespace DebScraper;
 
-public class liga
+public record liga
 {
+    public string name { get; set; }
     public string sourceUrl { get; set; }
-    public List<string> foundGamesUrl { get; set; } = new List<string>();
+    public List<Guid> Ids { get; set; } = new List<Guid>();
 }
