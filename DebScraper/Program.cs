@@ -12,7 +12,7 @@ public class Program
 
     private static IWebDriver _driver = new ChromeDriver();
 
-    private static string _gameIdFile = "C:\\Users\\public\\Documents\\DEB\\GameIds.txt";
+    private static string _gameIdFile = "./GameIds.txt";
 
     private static List<Game> _myGames = new List<Game>();
 
@@ -144,7 +144,6 @@ public class Program
 
     public static List<liga> GetLigen(int year)
     {
-        return null;
         // ----- Oberliga -----
         List<liga> ligen = new List<liga>();
         string oberligaSued = "https://deb-online.live/liga/herren/oberliga-sued/";
@@ -277,50 +276,3 @@ public class Program
         }
     }
 }
-
-// var actions = new Actions(driver);
-// var dropDownDivs = driver.FindElement(By.CssSelector("div.-hd-util-select-display.-hd-clickable"));
-// actions.MoveToElement(dropDownDivs).Click().Perform();
-//         
-// IWebElement dropDownDiv = driver.FindElement(By.CssSelector("div.-hd-util-select-display.-hd-clickable"));
-// dropDownDiv.Click();
-//         
-// var selectElement = new SelectElement(driver.FindElement(By.CssSelector(".-hd-los-division-picker-select-season")));
-// selectElement.SelectByText("Saison 2022/23");
-//         
-// IWebElement dropDownSaisons = driver.FindElement(By.CssSelector("-hd-util-select"));
-// dropDownSaisons.Click();
-//         
-//         
-// IWebElement dropDownSaison = driver.FindElement(By.CssSelector("div.-hd-util-select-display.-hd-clickable"));
-// dropDownSaison.Click();
-
-// public void GetAllIdsForNextYear()
-// {
-//     IWebElement listItemErgebnisse = driver.FindElement(By.Id("ergebnisse"));
-//     listItemErgebnisse.Click();
-//
-//     System.Threading.Thread.Sleep(3000);
-//
-//     IWebElement elemt = driver.FindElement(By.CssSelector("-hd-util-select "));
-//
-//     //elemt. = "-hd-util-select -hd-util-select-open"; 
-//
-//     WebDriverWait wait = new WebDriverWait(driver, TimeSpan.FromSeconds(10));
-//     IWebElement selectElementVisible = wait.Until(ExpectedConditions.ElementIsVisible(By.CssSelector(".-hd-los-division-picker-select-season")));
-//
-//     IWebElement table = driver.FindElement(By.TagName("table"));
-//
-//     //manuell Saison auswählen
-//     ReadOnlyCollection<IWebElement> rows = table.FindElements(By.TagName("tr"));
-//
-//     foreach (IWebElement row in rows)
-//     {
-//         ReadOnlyCollection<IWebElement> cells = row.FindElements(By.TagName("td"));
-//         foreach (IWebElement cell in cells)
-//         {
-//             Console.WriteLine(cell.Text);
-//         }
-//     }
-// }
-// }

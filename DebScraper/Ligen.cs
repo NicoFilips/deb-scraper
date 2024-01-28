@@ -7,34 +7,26 @@ public static class Ligen
 {
     public static List<Guid> ReadFileLines(string filePath)
     {
-        // Überprüfen Sie, ob die Datei existiert, bevor Sie versuchen, sie zu lesen
         if (!File.Exists(filePath))
         {
             throw new FileNotFoundException($"Die Datei {filePath} wurde nicht gefunden.");
         }
 
-        // Lesen Sie alle Zeilen der Datei und geben Sie sie als String-Array zurück
-        string[] lines = File.ReadAllLines(filePath);
-        List<Guid> allLines = new List<Guid>();
-        foreach (var line in lines)
-        {
-            if (!line.StartsWith("---"))
+        var guids = File.ReadAllLines(filePath)
+            .Where(line => !line.StartsWith("---") && !string.IsNullOrWhiteSpace(line))
+            .Select(line => line.Replace("\"", "").Trim())
+            .Select(id =>
             {
-                if (!string.IsNullOrWhiteSpace(line))
+                if (Guid.TryParse(id, out var guid))
                 {
-                    try
-                    {
-                        var id = line.Replace("\"", "");
-                        var guid = Guid.Parse(id);
-                        allLines.Add(guid);
-                    } 
-                    catch (Exception e)
-                    {
-                        Console.WriteLine(e);
-                    }
+                    return guid;
                 }
-            }
-        }
-        return allLines;
+
+                return Guid.Empty;
+            })
+            .Where(guid => guid != Guid.Empty)
+            .ToList();
+
+        return guids;
     }
 }
