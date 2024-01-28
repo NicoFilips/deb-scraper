@@ -12,7 +12,7 @@
 
 [![.NET build](https://github.com/NicoFilips/DebScraper/actions/workflows/build.yml/badge.svg)](https://github.com/NicoFilips/DebScraper/actions/workflows/build.yml)
 
-# HockeyRef Game Tracker
+# German Hockey League Game Tracker
 
 ## About
 This repository contains a .NET 8 project utilizing C# that leverages Selenium to scrape public data for tax preparation purposes. Specifically, it retrieves game details that I have officiated in the German hockey leagues, aiding in the organization and declaration of activities related to my role as an ice hockey referee.
